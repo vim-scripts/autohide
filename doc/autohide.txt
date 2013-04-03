@@ -1,0 +1,24 @@
+*autohide.vim*
+
+A simple plugin to set the "hidden" filesystem attribute on a
+Windows system for files created by Vim. By default only nuisance files
+created by Vim automatically due to user settings are hidden. The user can
+configure the plugin to hide more files automatically, even files directly
+created by the user.
+
+Created by Ben Fritz (fritzophrenic@gmail.com) under the MIT license.
+
+*g:autohide_types* (default suv)
+  b = backup files (currently doesn't work with 'backupdir')
+  s = swap files
+  u = undo files
+  v = viminfo
+  p = files matching pattern
+
+*g:autohide_file_list* (default [.*])
+  This is a wildcard, not a regular expression. So the default .* matches not
+  "any characters" but rather "file names starting with a . character". Set
+  this option to a |List| of wildcards for files you want Vim to hide while
+  you are editing.
+
+vim: autoindent ft=help
