@@ -1,7 +1,7 @@
 " autohide: a Vim global plugin to automatically hide files on Windows
 "   Sets the 'hidden' filesystem attribute for files created automatically by
 "   Vim, and/or for files in a user-created list whenever Vim writes them.
-" Last Change: 2013 Apr 06
+" Last Change: 2013 Jun 05
 " Maintainer: Ben Fritz <fritzophrenic@gmail.com>
 " Repository/Issues list: http://vim-autohide-plugin.googlecode.com/
 " License: MIT <http://opensource.org/licenses/MIT>
@@ -10,7 +10,7 @@
 if exists('g:loaded_autohide') || !has('win32') || v:version < 700
   finish
 endif
-let g:loaded_autohide = 2
+let g:loaded_autohide = 3
 
 let s:save_cpo=&cpo
 set cpo&vim
@@ -20,8 +20,13 @@ autocmd BufWritePost * call s:HideFilesOnWrite(expand("<afile>:p"))
 autocmd VimLeave * call s:HideFilesOnExit()
 
 function Autohide_DoHide(file)
+  let delay=0
+  while !filewritable(a:file) && delay < s:GetMaxDelay()
+    let delay += 1
+    sleep 1
+  endwhile
   if exists('g:autohide_debug')
-    echomsg "trying to hide" a:file
+    echomsg "trying to hide" a:file "after waiting" delay "seconds"
   endif
   if filewritable(a:file)
     if system('attrib /L +H '.s:SafeShellEscape(a:file)) =~? '^Invalid switch'
@@ -31,6 +36,14 @@ function Autohide_DoHide(file)
   endif
   if exists('g:autohide_debug')
     echomsg system('attrib '.s:SafeShellEscape(a:file))
+  endif
+endfun
+
+function s:GetMaxDelay()
+  if exists('g:autohide_max_wait_for_write')
+    return g:autohide_max_wait_for_write
+  else
+    return 2
   endif
 endfun
 
@@ -74,7 +87,7 @@ function s:HideFilesOnWrite(file)
     let l:fpats = s:GetFilePatterns()
     for pattern in l:fpats
       let candidates = globpath(fnamemodify(a:file,':p:h'), pattern)
-      if candidates =~? "\\(^\\|\n\\)".a:file."\\(\n\\|$\\)"
+      if candidates =~? "\\(^\\|\n\\)".escape(a:file, '\')."\\(\n\\|$\\)"
         call Autohide_DoHide(a:file)
         break
       endif

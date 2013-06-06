@@ -8,7 +8,7 @@ created by the user.
 
 Created by Ben Fritz (fritzophrenic@gmail.com) under the MIT license.
 
-There are two options for the autohide plugin:
+There are three options for the autohide plugin:
 
 *g:autohide_types* (default "suv")
   b = backup files (currently doesn't work with 'backupdir')
@@ -24,8 +24,14 @@ There are two options for the autohide plugin:
   this option to a |List| of wildcards for files you want Vim to hide while
   you are editing.
 
-And one public function if you want to hide files in ways the plugin doesn't
-support yet:
+*g:autohide_max_wait_for_write* (default 2)
+  Maximum number of seconds to wait for the file being hidden to become
+  writable before giving up. Useful for network file systems where the undo
+  file especially may take a while to show as writable. Set to zero or less to
+  never wait.
+
+There is also one public function if you want to hide files in ways the plugin
+doesn't support yet:
 
 Autohide_DoHide({file})                                     *Autohide_DoHide()*
   Sets the "hidden" filesystem attribute on {file}. Will properly escape the
